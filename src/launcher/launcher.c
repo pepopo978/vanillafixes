@@ -34,6 +34,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	LPWSTR pWowExePath = UtilGetPath(pWowDirectory, L"WoW.exe");
 	LPWSTR pPatcherPath = UtilGetPath(pWowDirectory, L"VfPatcher.dll");
 	LPWSTR pNamPowerPath = UtilGetPath(pWowDirectory, L"nampower.dll");
+	LPWSTR pSuperWoWPowerPath = UtilGetPath(pWowDirectory, L"SuperWoWhook.dll");
 
 	// Check if the necessary files exist
 	AssertMessageBox(GetFileAttributes(pWowExePath) != INVALID_FILE_ATTRIBUTES,
@@ -70,6 +71,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	}
 
 	int injectError = RemoteLoadLibrary(pPatcherPath, processInfo.hProcess);
+
+    // Also inject SuperWoW if present in the game directory
+    if (GetFileAttributes(pSuperWoWPowerPath) != INVALID_FILE_ATTRIBUTES)
+    {
+        injectError = injectError || RemoteLoadLibrary(pSuperWoWPowerPath, processInfo.hProcess);
+    }
 
 	// Also inject Nampower if present in the game directory
 	if (GetFileAttributes(pNamPowerPath) != INVALID_FILE_ATTRIBUTES)
